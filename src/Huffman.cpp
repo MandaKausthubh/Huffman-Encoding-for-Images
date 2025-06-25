@@ -1,9 +1,8 @@
 #include <queue>
-#include <unordered_map>
 #include <vector>
 #include <string>
 #include <memory>
-#include "Encoding.h"
+#include "../include/Pixel.h"
 
 using namespace std;
 
