@@ -8,9 +8,6 @@ using namespace std;
 
 #include "Pixel.h"
 
-
-
-
 struct ImageNode {
     Pixel px;
     long long freq;
@@ -31,13 +28,11 @@ void BuildHuffman(
         unordered_map<string, Pixel>& reverseCodeTable
 ) ;
 
-
 string EncodeImage(
     const vector<Pixel>& pixels,
     unordered_map<Pixel, string, hash<Pixel>>& codeTable,
     unordered_map<string, Pixel>& reverseCodeTable
 );
-
 
 void DecodeImage(
         const string& encoded,

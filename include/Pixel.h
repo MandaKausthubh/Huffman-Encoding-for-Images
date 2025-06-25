@@ -31,7 +31,7 @@ struct Image {
     Image(const std::vector<Pixel>& px, size_t w, size_t h);
 };
 
-void ReadImageFromPNG(const char* filename, Image& image);
+Image ReadImageFromPNG(const char* filename);
 void WriteImageToPNG(const char* filename, const Image& image);
 
 #endif
