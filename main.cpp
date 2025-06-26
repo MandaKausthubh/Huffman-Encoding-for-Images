@@ -22,8 +22,8 @@ int main() {
     cin >> binFileName;
 
     // Read the image from the PNG file
-    Image img = ReadImageFromPNG(inputFileName.c_str());
-    if (img.pixels.empty()) {
+    DualImage img = ReadImageFromWebP(inputFileName.c_str());
+    if (img.MainImage.pixels.empty() || img.ErrorImage.pixels.empty()) {
         cerr << "Error: Could not read image from " << inputFileName << endl;
         return 1;
     }
@@ -31,32 +31,74 @@ int main() {
     // Create a frequency map for the pixels
     unordered_map<string, Pixel> reverseCodeTable;
     unordered_map<Pixel, string, hash<Pixel>> codeTable;
-    BuildHuffman(img.pixels, codeTable, reverseCodeTable);
+    unordered_map<Pixel, string, hash<Pixel>> errorCodeTable;
+    unordered_map<string, Pixel> errorReverseCodeTable;
+
+    BuildHuffman(
+        img.MainImage.pixels,
+        codeTable,
+        reverseCodeTable
+    );
+    BuildHuffman(
+        img.ErrorImage.pixels,
+        errorCodeTable,
+        errorReverseCodeTable
+    );
     if (codeTable.empty()) {
         cerr << "Error: Could not build Huffman tree." << endl;
         return 1;
     }
 
     // Encode the image using Huffman coding
-    string encodedImage = EncodeImage(img.pixels, codeTable, reverseCodeTable);
+    string encodedImage = EncodeImage(
+                                img.MainImage.pixels,
+                                codeTable,
+                                reverseCodeTable);
+    string encodedErrorImage = EncodeImage(
+        img.ErrorImage.pixels,
+        errorCodeTable,
+        errorReverseCodeTable);
+
     if (encodedImage.empty()) {
         cerr << "Error: Could not encode image." << endl;
         return 1;
     }
-    write_to_bin_file(binFileName, reverseCodeTable, img.height, img.width, encodedImage);
+    write_to_bin_file(
+        binFileName,
+        reverseCodeTable,
+        errorReverseCodeTable,
+        img.MainImage.height, img.MainImage.width,
+        encodedImage,
+        encodedErrorImage
+    );
 
 
     // Decode the image back to pixels
     vector<Pixel> decodedPixels;
-    read_from_bin_file(binFileName, reverseCodeTable, img.height, img.width, encodedImage);
-    DecodeImage(encodedImage, decodedPixels, reverseCodeTable);
-    if (decodedPixels.empty()) {
+    vector<Pixel> decodedErrorPixels;
+    unordered_map<string, Pixel> reverseCodeTableError_testing;
+    unordered_map<string, Pixel> reverseCodeTableMain_testing;
+
+    read_from_bin_file(
+        binFileName,
+        reverseCodeTableMain_testing,
+        reverseCodeTableError_testing,
+        img.MainImage.height, img.MainImage.width,
+        encodedImage, encodedErrorImage
+    );
+
+    DecodeImage(encodedImage, decodedPixels, reverseCodeTableMain_testing);
+    DecodeImage(encodedErrorImage, decodedErrorPixels, reverseCodeTableError_testing);
+    if (decodedPixels.empty() || decodedErrorPixels.empty()) {
         cerr << "Error: Could not decode image." << endl;
         return 1;
     }
-    // Create a new Image object with the decoded pixels
-    Image decodedImage(decodedPixels, img.width, img.height);
-    WriteImageToPNG(outputFileName.c_str(), decodedImage);
+
+    WriteImageToPNG(outputFileName.c_str(), DualImage(
+        Image(decodedPixels, img.MainImage.width, img.MainImage.height),
+        Image(decodedErrorPixels, img.ErrorImage.width, img.ErrorImage.height)
+    ));
+
 
     cout << "Image decoded and saved to " << outputFileName << endl;
     cout << "Image encoded and saved to " << binFileName << endl;

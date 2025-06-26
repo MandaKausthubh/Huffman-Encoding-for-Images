@@ -3,17 +3,9 @@
 #include <string>
 #include <memory>
 #include "../include/Pixel.h"
+#include "../include/Huffman.h"
 
 using namespace std;
-
-struct ImageNode {
-    Pixel px;
-    long long freq;
-    shared_ptr<ImageNode> left, right;
-    ImageNode(Pixel p) : px(p), left(nullptr), right(nullptr) {}
-    ImageNode(shared_ptr<ImageNode> l, shared_ptr<ImageNode> r)
-        : px(Pixel(0, 0, 0)), left(l), right(r) {}
-};
 
 struct Comparte {
     bool operator()(shared_ptr<ImageNode> const& a, shared_ptr<ImageNode> const& b) {
@@ -51,7 +43,7 @@ void BuildHuffman(
 
     // Create nodes for each pixel
     for (const auto& pair : freqMap) {
-        shared_ptr<ImageNode> node = make_shared<ImageNode>(pair.first);
+        shared_ptr<ImageNode> node = make_shared<ImageNode>(pair.first, pair.second);
         node->freq = pair.second;
         pq.push(node);
     }
