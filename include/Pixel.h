@@ -10,11 +10,18 @@ struct Pixel {
     // Constructors
     Pixel();
     Pixel(int r, int g, int b);
+
+    bool operator==(const Pixel& other) const;
 };
 
 namespace std {
-    template<> struct hash<Pixel> {
-        size_t operator()(const Pixel&) const;
+    template <>
+    struct hash<Pixel> {
+        size_t operator()(const Pixel& p) const {
+            return ((std::hash<int>()(p.r)
+                    ^ (std::hash<int>()(p.g) << 1)) >> 1)
+                    ^ (std::hash<int>()(p.b) << 1);
+        }
     };
 }
 

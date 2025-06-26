@@ -45,6 +45,20 @@ int main() {
     }
     write_to_bin_file(binFileName, reverseCodeTable, img.height, img.width, encodedImage);
 
+
+    // Decode the image back to pixels
+    vector<Pixel> decodedPixels;
+    read_from_bin_file(binFileName, reverseCodeTable, img.height, img.width, encodedImage);
+    DecodeImage(encodedImage, decodedPixels, reverseCodeTable);
+    if (decodedPixels.empty()) {
+        cerr << "Error: Could not decode image." << endl;
+        return 1;
+    }
+    // Create a new Image object with the decoded pixels
+    Image decodedImage(decodedPixels, img.width, img.height);
+    WriteImageToPNG(outputFileName.c_str(), decodedImage);
+
+    cout << "Image decoded and saved to " << outputFileName << endl;
     cout << "Image encoded and saved to " << binFileName << endl;
     cout << "Exiting program..." << endl;
 

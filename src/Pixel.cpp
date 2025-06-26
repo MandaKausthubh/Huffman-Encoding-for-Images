@@ -4,6 +4,9 @@
 
 Pixel::Pixel() : r(0), g(0), b(0) {}
 Pixel::Pixel(int r, int g, int b) : r(r), g(g), b(b) {}
+bool Pixel::operator==(const Pixel& other) const {
+    return r == other.r && g == other.g && b == other.b;
+}
 
 
 Image::Image() : width(0), height(0) {}
@@ -28,7 +31,7 @@ Image ReadImageFromPNG(const char *filename) {
 }
 
 
-void WriteImageToPNG(const char *filename, const Image &image) {
+void WriteImageToPNG(const char *filename, const Image &img) {
     png::image<png::rgb_pixel> png_img(img.width, img.height);
 
     for (size_t y = 0; y < img.height; ++y) {
