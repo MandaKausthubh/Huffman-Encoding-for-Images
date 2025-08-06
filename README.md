@@ -26,14 +26,6 @@ git clone https://github.com/MandaKausthubh/Huffman-Encoding-for-Images.git
 cd Huffman-Encoding-for-Images
 ```
 
-### Building:
-
-1. Using CMake:
-```
-cmake .
-make
-```
-
 
 
 
